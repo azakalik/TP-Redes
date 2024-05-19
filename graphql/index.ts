@@ -1,5 +1,5 @@
 import { ApolloServer } from 'apollo-server-azure-functions';
-import { typeDefs } from './schema';
+import { typeDefs } from '../schema/schema';
 // Resolver map.
 
 import { CosmosDataSource } from 'apollo-datasource-cosmosdb';

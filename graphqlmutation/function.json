@@ -1,0 +1,20 @@
+{
+    "bindings": [
+      {
+        "authLevel": "admin",
+        "type": "httpTrigger",
+        "direction": "in",
+        "name": "req",
+        "route": "authadmin",
+        "methods": [
+          "post"
+        ]
+      },
+      {
+        "type": "http",
+        "direction": "out",
+        "name": "$return"
+      }
+    ],
+    "scriptFile": "../dist/graphqlmutation/index.js"
+  }

@@ -5,6 +5,11 @@ export const typeDefs = gql`
     user(id: String!): User
     car(id: String!): Car
   }
+
+  type Mutation {
+    createCar(car: CarInp!): Car!
+  }
+
   type User {
     id: String
     firstName: String
@@ -13,6 +18,13 @@ export const typeDefs = gql`
     car: Car # Return a Car object instead of ID
   }
   type Car {
+    id: String
+    make: String
+    model: String
+    miles: Int
+  }
+
+  input CarInp {
     id: String
     make: String
     model: String
