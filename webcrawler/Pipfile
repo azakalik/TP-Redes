@@ -16,4 +16,6 @@ azure-identity = "*"
 python_version = "3.10"
 
 [scripts]
+build = "docker build -t my-azure-function-app ."
+scrape = "docker run --rm -it my-azure-function-app"
 main = "python -m src.main"
