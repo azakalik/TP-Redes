@@ -33,9 +33,14 @@ const resolvers = {
             const {resource} =  await (
                 context.dataSources.car as CosmosDataSource<Car, unknown>
             ).createOne(car);
-            
             return resource;
         },
+
+        deleteCar: async (_, params, context) => {
+            const carId = params.id;
+            const { resource: deletedResource} = await (context.dataSources.car as CosmosDataSource<Car, unknown>).deleteOne(carId);
+            return deletedResource;
+        }
     },
 };
 
