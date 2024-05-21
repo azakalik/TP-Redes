@@ -38,6 +38,8 @@ RUN cd /home/site/wwwroot/webcrawler && pipenv install
 # 4. Finally, copy python code to image
 COPY . /home/site/wwwroot/webcrawler
 
-# 5. Execute code
-RUN echo heeeeeeeeeeeeeeeeeeeeeeeeeeeyyyyy
-# RUN pipenv run main
+# 5. Set the working directory
+WORKDIR /home/site/wwwroot/webcrawler
+
+# 6. Command to run the main function
+CMD ["pipenv", "run", "main"]

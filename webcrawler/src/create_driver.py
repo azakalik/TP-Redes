@@ -16,9 +16,9 @@ def create_driver() -> Chrome:
         # Disables the pop-up blocker.
         chrome_options.add_argument("--disable-popup-blocking")
         chrome_options.add_argument("--disable-dev-shm-usage")
-        # chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-gpu")
-        # chrome_options.add_argument("--single-process")
+        chrome_options.add_argument("--single-process")
         chrome_options.add_argument(f"--user-data-dir={mkdtemp()}")
         chrome_options.add_argument(f"--data-path={mkdtemp()}")
         chrome_options.add_argument(f"--disk-cache-dir={mkdtemp()}")
