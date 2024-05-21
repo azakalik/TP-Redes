@@ -5,6 +5,7 @@ export const typeDefs = gql`
     user(id: String!): User
     car(id: String!): Car
     listCars(limit: Int, offset: Int): CarPage
+    listUsers(limit: Int, offset: Int): UsersPage
   }
 
   type Mutation {
@@ -36,6 +37,11 @@ export const typeDefs = gql`
 
   type CarPage {
     items: [Car]
+    itemsCount: Int
+  }
+
+  type UsersPage {
+    items: [User]
     itemsCount: Int
   }
 `;
