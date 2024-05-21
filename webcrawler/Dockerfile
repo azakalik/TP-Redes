@@ -1,35 +1,30 @@
+# 0. Extend from the Azure Functions Python base image
 FROM mcr.microsoft.com/azure-functions/python:4-python3.10
 
-# 0. Install essential packages
+# 1. Install essential packages
 RUN apt-get update \
     && apt-get install -y \
-        build-essential \
-        cmake \
         git \
         wget \
-        unzip \
+        curl  \
+        unzip  \
+        cmake   \
         unixodbc-dev \
+        build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# 1. Install Chrome (root image is debian)
-# See https://stackoverflow.com/questions/49132615/installing-chrome-in-docker-file
-ARG CHROME_VERSION="google-chrome-stable"
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-  && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
-  && apt-get update -qqy \
-  && apt-get -qqy install \
-    ${CHROME_VERSION:-google-chrome-stable} \
-  && rm /etc/apt/sources.list.d/google-chrome.list \
-  && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
+# 1. Install Chrome and Chromedriver
+RUN \
+    curl -Lo "/tmp/chromedriver-linux64.zip" "https://storage.googleapis.com/chrome-for-testing-public/123.0.6312.105/linux64/chromedriver-linux64.zip" && \
+    curl -Lo "/tmp/chrome-linux64.zip" "https://storage.googleapis.com/chrome-for-testing-public/123.0.6312.105/linux64/chrome-linux64.zip" && \
+    unzip /tmp/chromedriver-linux64.zip -d /opt/ && \
+    unzip /tmp/chrome-linux64.zip -d /opt/
 
-# 2. Install Chrome driver used by Selenium
-RUN LATEST=$(wget -q -O - http://chromedriver.storage.googleapis.com/LATEST_RELEASE) && \
-    wget http://chromedriver.storage.googleapis.com/$LATEST/chromedriver_linux64.zip && \
-    unzip chromedriver_linux64.zip && ln -s $PWD/chromedriver /usr/local/bin/chromedriver
+# 2. Install necessary dependencies to run Chrome and Chromedriver
+RUN apt update && apt upgrade
+RUN apt-get -y install libnss3-dev libgdk-pixbuf2.0-dev libgtk-3-dev libxss-dev libasound2
 
-ENV PATH="/usr/local/bin/chromedriver:${PATH}"
-
-# Install dependencies
+# 3. Install Python dependencies
 RUN pip install pipenv
 RUN mkdir -p /home/site/wwwroot/webcrawler
 COPY Pipfile /home/site/wwwroot/webcrawler
