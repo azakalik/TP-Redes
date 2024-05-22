@@ -17,10 +17,10 @@ export const typeDefs = gql`
   }
 
   input UserInp {
-    id: String
-    firstName: String
-    lastName: String
-    age: Int
+    id: String!
+    firstName: String!
+    lastName: String!
+    age: Int!
     carId: String! 
   }
 
@@ -40,10 +40,10 @@ export const typeDefs = gql`
   }
 
   input CarInp {
-    id: String
-    make: String
-    model: String
-    miles: Int
+    id: String!
+    make: String!
+    model: String!
+    miles: Int!
   }
 
   type CarPage {

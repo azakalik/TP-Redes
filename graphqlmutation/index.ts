@@ -60,33 +60,57 @@ const resolvers = {
     Mutation: {
         createCar: async (_, params, context) => {
             const car: Car = params.car;
-            const { resource } = await (
-                context.dataSources.car as CosmosDataSource<Car, unknown>
-            ).createOne(car);
-            return resource;
+
+            try {
+                const resp = await (
+                    context.dataSources.car as CosmosDataSource<Car, unknown>
+                ).createOne(car);
+                return { success: true, message: `Succesfully created car with id ${car.id}`, status: resp.statusCode };
+            } catch (error) {
+                return { success: false, message: `Creation failed: code ${error.body.code}`, status: error.code };
+            }
         },
 
         deleteCar: async (_, params, context) => {
             const carId = params.id;
 
+            const { resources: usersArray} = await (context.dataSources.user as CosmosDataSource<User,unknown>)
+            .findManyByQuery({ query: "SELECT * FROM c WHERE c.carId = @carId", parameters : [{name: "@carId", value: carId}] });
+            
+            if (usersArray.length > 0)
+                return {success: false, message: `Deletion operation failed because ${usersArray.length} users have this car assigned`, code: 409};
+
             try {
                 const resp = await (
                     context.dataSources.car as CosmosDataSource<Car, unknown>
-                ).deleteOne(carId,carId);
-
-                return { success : true, message: `Succesfully Deleted Car with Id ${carId}` , status: resp.statusCode};
+                ).deleteOne(carId, carId);
+                return { success: true, message: `Succesfully Deleted Car with Id ${carId}`, status: resp.statusCode };
             } catch (error) {
-                return {success: false, message: `Deletion operation failed`, status: error.code}
+                return { success: false, message: `Deletion operation failed: code ${error.body.code}`, status: error.code }
             }
-           
+
         },
 
-        deleteUser: async (_, params, context) => {
-            const userId = params.id;
-            const { resource: deletedResource } = await (
-                context.dataSources.user as CosmosDataSource<User, unknown>
-            ).deleteOne(userId);
-            return deletedResource;
+        deleteUser: async (_, { id }, context) => {
+            const userId = id;
+
+            try {
+                const resp = await (
+                    context.dataSources.user as CosmosDataSource<User, unknown>
+                ).deleteOne(userId, userId);
+
+                return {
+                    success: true,
+                    message: `Successfully deleted user with ID ${userId}`,
+                    status: resp.statusCode
+                };
+            } catch (error) {
+                return {
+                    success: false,
+                    message: `Deletion operation failed for user with ID ${userId}, code: ${error.body.code}`,
+                    status: error.code
+                };
+            }
         },
 
         createUser: async (_, params, context) => {
@@ -96,16 +120,20 @@ const resolvers = {
             ).findOneById(user.carId);
             //manage error if resource doesnt exist
             if (!carResource) {
-                throw new ApolloError(
-                    "User has no car asociated",
-                    "INTERNAL_SERVER_ERROR"
-                );
+                return { success: true, message: "User to be created must have a car resource assigned", status: 409 }
             }
 
-            const { resource: userResource } = await (
-                context.dataSources.user as CosmosDataSource<User, unknown>
-            ).createOne(user);
-            return userResource;
+
+            try {
+
+                const response = await (
+                    context.dataSources.user as CosmosDataSource<User, unknown>
+                ).createOne(user);
+                return { success: true, message: `User with id ${user.id} created successfully`, status: response.statusCode };
+            } catch (error) {
+                return { success: false, message: `User with id ${user.id} could not be created. Code: ${error.body.code}`, status: error.code}
+            }
+
         },
     },
 };
