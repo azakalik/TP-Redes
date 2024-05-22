@@ -1,15 +1,12 @@
 import { gql } from "apollo-server-azure-functions";
 
 export const typeDefs = gql`
-  type Query {
-    user(id: String!): User
-    car(id: String!): Car
-    listCars(limit: Int, offset: Int): CarPage
-  }
 
   type Mutation {
     createCar(car: CarInp!): Car!
     deleteCar(car: CarInp!): Car!
+    createUser(user: User!): User!
+    
   }
 
   type User {

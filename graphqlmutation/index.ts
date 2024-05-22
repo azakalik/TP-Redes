@@ -1,10 +1,10 @@
-import { ApolloServer } from "apollo-server-azure-functions";
-import { typeDefs } from "../schema/schema";
+import { ApolloError, ApolloServer } from "apollo-server-azure-functions";
+import { typeDefs } from "./schema";
 // Resolver map.
 import { CosmosDataSource } from "apollo-datasource-cosmosdb";
 import { CosmosClient } from "@azure/cosmos";
 import { Car } from "../models/car";
-
+import { User } from "../models/user";
 const buildCosmosDataSource = <TData extends { id: string }>(
     containerId: string
 ) => {
@@ -40,6 +40,18 @@ const resolvers = {
             const carId = params.id;
             const { resource: deletedResource} = await (context.dataSources.car as CosmosDataSource<Car, unknown>).deleteOne(carId);
             return deletedResource;
+        },
+
+        createUser: async (_,params,context) => {
+            const user: User = params.user;
+            const  carResource = await (context.dataSources.car as CosmosDataSource<Car, unknown>).findOneById(user.carId);
+            //manage error if resource doesnt exist
+            if (!carResource){
+                throw new ApolloError("User has no car asociated","INTERNAL_SERVER_ERROR");
+            }
+
+            const {resource: userResource} = await (context.dataSources.user as CosmosDataSource<User, unknown>).createOne(user);
+            return userResource;
         }
     },
 };
