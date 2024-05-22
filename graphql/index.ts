@@ -58,9 +58,6 @@ const resolvers = {
         ],
       });
       return { items: resources, itemsCount : resources.length};
-
-      
-
     }
 
   },

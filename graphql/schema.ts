@@ -8,10 +8,6 @@ export const typeDefs = gql`
     listUsers(limit: Int, offset: Int): UsersPage
   }
 
-  type Mutation {
-    createCar(car: CarInp!): Car!
-    deleteCar(car: CarInp!): Car!
-  }
 
   type User {
     id: String
@@ -28,12 +24,6 @@ export const typeDefs = gql`
     miles: Int
   }
 
-  input CarInp {
-    id: String
-    make: String
-    model: String
-    miles: Int
-  }
 
   type CarPage {
     items: [Car]

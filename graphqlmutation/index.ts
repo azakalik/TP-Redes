@@ -24,13 +24,43 @@ const resolvers = {
         user: async (_, params, context) => {
             return context.dataSources.user.findOneById(params.id);
         },
-    },
+        car: async (_, params, context) => {
+            return context.dataSources.car.findOneById(params.id);
+        },
 
+        listCars: async (_, params, context) => {
+            const { limit = 10, offset = 0 } = params;
+            const { resources } = await (
+                context.dataSources.car as CosmosDataSource<Car, unknown>
+            ).findManyByQuery({
+                query: "SELECT * FROM c OFFSET @offset LIMIT @limit",
+                parameters: [
+                    { name: "@offset", value: offset },
+                    { name: "@limit", value: limit },
+                ],
+            });
+            return { items: resources, itemsCount: resources.length };
+        },
+
+        listUsers: async (_, params, context) => {
+            const { limit = 10, offset = 0 } = params;
+            const { resources } = await (
+                context.dataSources.user as CosmosDataSource<User, unknown>
+            ).findManyByQuery({
+                query: "SELECT * FROM c OFFSET @offset LIMIT @limit",
+                parameters: [
+                    { name: "@offset", value: offset },
+                    { name: "@limit", value: limit },
+                ],
+            });
+            return { items: resources, itemsCount: resources.length };
+        },
+    },
 
     Mutation: {
         createCar: async (_, params, context) => {
-            const car : Car = params.car;
-            const {resource} =  await (
+            const car: Car = params.car;
+            const { resource } = await (
                 context.dataSources.car as CosmosDataSource<Car, unknown>
             ).createOne(car);
             return resource;
@@ -38,21 +68,45 @@ const resolvers = {
 
         deleteCar: async (_, params, context) => {
             const carId = params.id;
-            const { resource: deletedResource} = await (context.dataSources.car as CosmosDataSource<Car, unknown>).deleteOne(carId);
+
+            try {
+                const resp = await (
+                    context.dataSources.car as CosmosDataSource<Car, unknown>
+                ).deleteOne(carId,carId);
+
+                return { success : true, message: `Succesfully Deleted Car with Id ${carId}` , status: resp.statusCode};
+            } catch (error) {
+                return {success: false, message: `Deletion operation failed`, status: error.code}
+            }
+           
+        },
+
+        deleteUser: async (_, params, context) => {
+            const userId = params.id;
+            const { resource: deletedResource } = await (
+                context.dataSources.user as CosmosDataSource<User, unknown>
+            ).deleteOne(userId);
             return deletedResource;
         },
 
-        createUser: async (_,params,context) => {
+        createUser: async (_, params, context) => {
             const user: User = params.user;
-            const  carResource = await (context.dataSources.car as CosmosDataSource<Car, unknown>).findOneById(user.carId);
+            const carResource = await (
+                context.dataSources.car as CosmosDataSource<Car, unknown>
+            ).findOneById(user.carId);
             //manage error if resource doesnt exist
-            if (!carResource){
-                throw new ApolloError("User has no car asociated","INTERNAL_SERVER_ERROR");
+            if (!carResource) {
+                throw new ApolloError(
+                    "User has no car asociated",
+                    "INTERNAL_SERVER_ERROR"
+                );
             }
 
-            const {resource: userResource} = await (context.dataSources.user as CosmosDataSource<User, unknown>).createOne(user);
+            const { resource: userResource } = await (
+                context.dataSources.user as CosmosDataSource<User, unknown>
+            ).createOne(user);
             return userResource;
-        }
+        },
     },
 };
 
@@ -62,6 +116,7 @@ const server = new ApolloServer({
     resolvers,
     dataSources: () => ({
         car: buildCosmosDataSource<Car>("cars"),
+        user: buildCosmosDataSource<User>("users")
     }),
 });
 export default server.createHandler();

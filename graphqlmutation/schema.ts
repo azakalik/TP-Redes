@@ -2,11 +2,26 @@ import { gql } from "apollo-server-azure-functions";
 
 export const typeDefs = gql`
 
+  type Query {
+    user(id: String!): User
+    car(id: String!): Car
+    listCars(limit: Int, offset: Int): CarPage
+    listUsers(limit: Int, offset: Int): UsersPage
+  }
+
   type Mutation {
-    createCar(car: CarInp!): Car!
-    deleteCar(car: CarInp!): Car!
-    createUser(user: User!): User!
-    
+    createCar(car: CarInp!): MutationResponse!
+    deleteCar(id: String!): MutationResponse!
+    createUser(user: UserInp!): MutationResponse!
+    deleteUser(id: String!): MutationResponse!
+  }
+
+  input UserInp {
+    id: String
+    firstName: String
+    lastName: String
+    age: Int
+    carId: String! 
   }
 
   type User {
@@ -35,4 +50,16 @@ export const typeDefs = gql`
     items: [Car]
     itemsCount: Int
   }
+
+  type UsersPage {
+    items: [User]
+    itemsCount: Int
+  }
+
+  type MutationResponse {
+    success: Boolean!
+    message: String!
+    status: Int!
+  }
+  
 `;
