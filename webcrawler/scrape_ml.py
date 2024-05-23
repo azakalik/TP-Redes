@@ -44,7 +44,6 @@ def find_all_publication_cards(driver: Chrome) -> list[PublicationDTO]:
             location = items[5]
             publication = PublicationDTO(price=price, year=year, km=km, title=title, location=location, url=url, img_url=img_url)
             publications.append(publication)
-            print(publication)
         except Exception as e:
             idx -= 1
 
