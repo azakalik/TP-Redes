@@ -9,11 +9,25 @@ export const typeDefs = gql`
   }
 
 
+  type Mutation {
+    createUser(user: UserInp!): MutationResponse!
+    takeCar(id: String!): MutationResponse!
+  }
+
+
+  input UserInp {
+    id: String!
+    name: String!
+    lastName: String!
+    age: Int!
+  }
+
+
   type User {
-    id: String
-    firstName: String
-    lastName: String
-    age: Int
+    id: String!
+    name: String!
+    lastName: String!
+    age: Int!
     car: Car # Return a Car object instead of ID
   }
 
@@ -34,4 +48,12 @@ export const typeDefs = gql`
     items: [User]
     itemsCount: Int
   }
+
+  type MutationResponse {
+    success: Boolean!
+    message: String!
+    status: Int!
+  }
+
+
 `;

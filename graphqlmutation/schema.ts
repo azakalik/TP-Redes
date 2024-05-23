@@ -12,13 +12,12 @@ export const typeDefs = gql`
   type Mutation {
     createCar(car: CarInp!): MutationResponse!
     deleteCar(id: String!): MutationResponse!
-    createUser(user: UserInp!): MutationResponse!
     deleteUser(id: String!): MutationResponse!
   }
 
   input UserInp {
     id: String!
-    firstName: String!
+    name: String!
     lastName: String!
     age: Int!
     carId: String! 
@@ -26,7 +25,7 @@ export const typeDefs = gql`
 
   type User {
     id: String
-    firstName: String
+    name: String
     lastName: String
     age: Int
     car: Car # Return a Car object instead of ID

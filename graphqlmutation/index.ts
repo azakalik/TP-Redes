@@ -5,6 +5,7 @@ import { CosmosDataSource } from "apollo-datasource-cosmosdb";
 import { CosmosClient } from "@azure/cosmos";
 import { Car } from "../models/car";
 import { User } from "../models/user";
+import {user, car, listCars, listUsers} from "../commonFunctions/commonfunctions"
 const buildCosmosDataSource = <TData extends { id: string }>(
     containerId: string
 ) => {
@@ -21,40 +22,10 @@ const buildCosmosDataSource = <TData extends { id: string }>(
 // Resolver map.
 const resolvers = {
     Query: {
-        user: async (_, params, context) => {
-            return context.dataSources.user.findOneById(params.id);
-        },
-        car: async (_, params, context) => {
-            return context.dataSources.car.findOneById(params.id);
-        },
-
-        listCars: async (_, params, context) => {
-            const { limit = 10, offset = 0 } = params;
-            const { resources } = await (
-                context.dataSources.car as CosmosDataSource<Car, unknown>
-            ).findManyByQuery({
-                query: "SELECT * FROM c OFFSET @offset LIMIT @limit",
-                parameters: [
-                    { name: "@offset", value: offset },
-                    { name: "@limit", value: limit },
-                ],
-            });
-            return { items: resources, itemsCount: resources.length };
-        },
-
-        listUsers: async (_, params, context) => {
-            const { limit = 10, offset = 0 } = params;
-            const { resources } = await (
-                context.dataSources.user as CosmosDataSource<User, unknown>
-            ).findManyByQuery({
-                query: "SELECT * FROM c OFFSET @offset LIMIT @limit",
-                parameters: [
-                    { name: "@offset", value: offset },
-                    { name: "@limit", value: limit },
-                ],
-            });
-            return { items: resources, itemsCount: resources.length };
-        },
+        user,
+        car,
+        listCars,
+        listUsers
     },
 
     Mutation: {
@@ -88,7 +59,6 @@ const resolvers = {
             } catch (error) {
                 return { success: false, message: `Deletion operation failed: code ${error.body.code}`, status: error.code }
             }
-
         },
 
         deleteUser: async (_, { id }, context) => {
@@ -113,28 +83,7 @@ const resolvers = {
             }
         },
 
-        createUser: async (_, params, context) => {
-            const user: User = params.user;
-            const carResource = await (
-                context.dataSources.car as CosmosDataSource<Car, unknown>
-            ).findOneById(user.carId);
-            //manage error if resource doesnt exist
-            if (!carResource) {
-                return { success: true, message: "User to be created must have a car resource assigned", status: 409 }
-            }
-
-
-            try {
-
-                const response = await (
-                    context.dataSources.user as CosmosDataSource<User, unknown>
-                ).createOne(user);
-                return { success: true, message: `User with id ${user.id} created successfully`, status: response.statusCode };
-            } catch (error) {
-                return { success: false, message: `User with id ${user.id} could not be created. Code: ${error.body.code}`, status: error.code}
-            }
-
-        },
+       
     },
 };
 
