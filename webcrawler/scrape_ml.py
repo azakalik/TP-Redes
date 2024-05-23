@@ -4,7 +4,7 @@ from selenium.common.exceptions import StaleElementReferenceException
 from loguru import logger
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from .publication_dto import PublicationDTO
+from publication_dto import PublicationDTO
 import time
 
 

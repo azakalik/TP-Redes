@@ -1,19 +1,15 @@
-# Scraping
-## About
-This scrapes mercadolibre.com.ar for different car brands.
+# Azure Function with custom Docker container
+## Build the image
+Execute the following code
+```bash
+docker build --tag therealspackjarrow/azurefunctionsimage:v1.0.0 .
+```
 
-## Requirements
-- Python 3.10
-- Pip3
-- Pipenv (install with `pip3 install pipenv`)
-- Docker
-
-## Initialization
-1. `cd webcrawler`
-2. `pipenv install`
-
-## Creating (and recreating) the image
-`pipenv run build`
-
-## Running the image
-`pipenv run scrape`
+## Run the image locally
+Execute the following code
+```bash
+docker run -p 8080:80 -it <DOCKER_ID>/azurefunctionsimage:v1.0.0
+```
+You can then access the following endpoint: `http://localhost:8080/api/scrape_ml`
+Remember to add at the end a `car_brand`.
+For example: `http://localhost:8080/api/scrape_ml?car_brand=ford`
