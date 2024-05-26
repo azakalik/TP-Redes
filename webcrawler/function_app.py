@@ -33,6 +33,6 @@ def HttpExample(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(json.dumps(results))
     else:
         return func.HttpResponse(
-             "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response.",
-             status_code=200
+             "Please pass car_brand as a parameter.",
+             status_code=400
         )
