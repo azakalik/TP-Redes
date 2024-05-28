@@ -7,6 +7,7 @@ import json
 
 from create_driver import create_driver
 from scrape_ml import scrape_ml
+from save_publication_to_cosmos import save_publication_to_cosmos
 
 app = func.FunctionApp()
 
@@ -30,6 +31,8 @@ def HttpExample(req: func.HttpRequest) -> func.HttpResponse:
         for car in scraped_cars:
             id = car.get_publication_id()
             results[id] = dataclasses.asdict(car)
+            save_publication_to_cosmos(car)
+
         return func.HttpResponse(json.dumps(results))
     else:
         return func.HttpResponse(
