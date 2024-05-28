@@ -12,11 +12,11 @@ def scrape_ml(driver: Chrome, car_brand: str) -> list[PublicationDTO]:
     """Scrapes MercadoLibre for the prices of a car brand."""
 
     driver.get(f'https://listado.mercadolibre.com.ar/{car_brand}')
-    publications = find_all_publication_cards(driver)
+    publications = find_all_publication_cards(driver, car_brand)
     return publications
 
 
-def find_all_publication_cards(driver: Chrome) -> list[PublicationDTO]:
+def find_all_publication_cards(driver: Chrome, car_brand: str) -> list[PublicationDTO]:
     """Finds all <li> tags on the current page."""
     wait = WebDriverWait(driver, 10)
 
@@ -42,7 +42,7 @@ def find_all_publication_cards(driver: Chrome) -> list[PublicationDTO]:
             km = int(items[3].replace('.', '').replace(' Km', ''))
             title = items[4]
             location = items[5]
-            publication = PublicationDTO(price=price, year=year, km=km, title=title, location=location, url=url, img_url=img_url)
+            publication = PublicationDTO(price=price, year=year, km=km, title=title, location=location, url=url, img_url=img_url, car_brand=car_brand)
             publications.append(publication)
         except Exception as e:
             idx -= 1
