@@ -3,25 +3,20 @@ import azure.cosmos.cosmos_client as cosmos_client
 import azure.cosmos.exceptions as exceptions
 from azure.cosmos.partition_key import PartitionKey
 import datetime
+import requests
 
-import config
 from publication_dto import PublicationDTO
 
-HOST = config.settings['host']
-MASTER_KEY = config.settings['master_key']
-DATABASE_ID = config.settings['database_id']
-CONTAINER_ID = config.settings['container_id']
-
 def save_publication_to_cosmos(publication_dto: PublicationDTO):
-    client = cosmos_client.CosmosClient(HOST, {'masterKey': MASTER_KEY}, user_agent="CosmosDBPythonQuickstart", user_agent_overwrite=True)
     # Create a dictionary representing the item to be inserted into Cosmos DB
     item = publication_dto.to_dict()
-
-    # Insert the item into Cosmos DB
+    azure_function_url = "https://g4vrb5h9-7071.brs.devtunnels.ms/scrapperHandler"
     try:
-        client.get_database_client(DATABASE_ID).get_container_client(CONTAINER_ID).upsert_item(item)
-        print("Item inserted successfully into Cosmos DB.")
-    except exceptions.CosmosResourceExistsError:
-        print("Item already exists in Cosmos DB.")
-    except exceptions.CosmosHttpResponseError as e:
-        print(f"Failed to insert item into Cosmos DB. Status code: {e.status_code}, Message: {e.message}")
+        response = requests.post(azure_function_url, json=item)
+
+        response.raise_for_status()
+        print("Item inserted successfully via Azure Function.")
+    except requests.exceptions.HTTPError as http_err:
+        print(f"HTTP error occurred: {http_err}")
+    except Exception as err:
+        print(f"An error occurred: {err}")
