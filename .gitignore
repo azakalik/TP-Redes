@@ -4,3 +4,4 @@ dist/
 .vscode/
 *.pyc
 local.settings.json
+requests.http

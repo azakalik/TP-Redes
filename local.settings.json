@@ -1,0 +1,9 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "AzureWebJobsStorage": "",
+    "COSMOS_CONNECTION_STRING": "AccountEndpoint=https://sranucci.documents.azure.com:443/;AccountKey=iTEDZMT3V5mWlnJcawtqSKv8xg70zE9kqunC4b0Z2BrQmlqU3s8jjbdWd14DXFl95ag0XWv20IqcACDbRSdYEQ==",
+    "COSMOS_DATABASE_NAME": "exampleapp"
+  }
+}
