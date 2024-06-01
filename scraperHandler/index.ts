@@ -93,6 +93,7 @@ const cosmosScrapperInsertor: AzureFunction = async function (context: Context, 
     }
 
     const carDataSource = buildCosmosDataSource<Car>("cars");
+    carDataSource.initialize();
 
     await Promise.all(toInsertData.map(car => carDataSource.createOne(car)));
     
