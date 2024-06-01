@@ -5,3 +5,5 @@ dist/
 *.pyc
 local.settings.json
 requests.http
+.env
+clients/cert.json

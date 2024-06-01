@@ -31,7 +31,7 @@ def HttpExample(req: func.HttpRequest) -> func.HttpResponse:
         for car in scraped_cars:
             id = car.get_publication_id()
             results[id] = dataclasses.asdict(car)
-            save_publication_to_cosmos(car)
+        save_publication_to_cosmos(json.dumps(results))
 
         return func.HttpResponse(json.dumps(results))
     else:
