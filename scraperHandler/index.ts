@@ -63,7 +63,8 @@ const mapToModel = (id: string, entry: any) : Car =>
         location: entry["location"],
         imageUrl: entry["img_url"],
         carBrand: entry["car_brand"],
-        url: entry["url"]
+        url: entry["url"],
+        assignedToUserWithId: null
     }
  
     

@@ -6,7 +6,7 @@ export interface User {
     carId: string;
 }
 
-
+// const { name => name, lastName => lastName, age => age, email => id, password => a firebase nomas } = params.user;
 
 /*
 
