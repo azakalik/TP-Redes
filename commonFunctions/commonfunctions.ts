@@ -40,3 +40,22 @@ export const listUsers = async (_, params, context) => {
     return { items: resources, itemsCount: resources.length };
 }
 
+export const userResolver = {
+    car: async (parent, _, context) => {
+        if (!parent.carId) {
+            return null;
+        }
+        return context.dataSources.car.findOneById(parent.carId);
+    },
+}
+
+export const carResolver = {
+    user: async (parent, _, context) => {
+        const userMail = parent.assignedToUserWithId;
+        if (!userMail){
+            return null;
+        }
+        const userDataSource = context.dataSources.user as CosmosDataSource<User,unknown>
+        return userDataSource.findOneById(userMail);
+    }
+}
