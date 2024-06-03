@@ -8,6 +8,5 @@
       "connection": "AzureWebJobsStorage"
     }
   ],
-  "scriptFile": "../dist/blobTriggerFunction/index.js",
-  "entryPoint": "blobTrigger"
+  "scriptFile": "../dist/blobTriggerFunction/index.js"
 }

@@ -2,7 +2,7 @@ import { AzureFunction, Context } from "@azure/functions";
 import { CosmosClient } from "@azure/cosmos";
 import { v4 as uuidv4 } from "uuid";
 
-const blobTrigger: AzureFunction = async function (context: Context, myBlob: any): Promise<void> {
+const blobTriggerFunction: AzureFunction = async function (context: Context, myBlob: any): Promise<void> {
     context.log(`Blob trigger function processed blob \n Name: ${context.bindingData.blobTrigger} \n Blob Size: ${myBlob.length} Bytes`);
 
     // Configuración de Cosmos DB
@@ -41,4 +41,4 @@ const saveMaxPriceToCosmos = async (maxPrice: number, maxPriceId: string, contai
     await container.items.create(item);
 };
 
-export default blobTrigger;
+export default blobTriggerFunction;
