@@ -1,97 +1,44 @@
-import { AzureFunction, Context, HttpRequest } from "@azure/functions";
+import { AzureFunction, Context } from "@azure/functions";
 import { CosmosClient } from "@azure/cosmos";
-import axios from 'axios';
+import { v4 as uuidv4 } from "uuid";
 
-const blobTriggerFunction: AzureFunction = async function (
-  context: Context,
-  req: HttpRequest
-): Promise<void> {
-  context.log('HTTP trigger function processed a request.');
+const blobTrigger: AzureFunction = async function (context: Context, myBlob: any): Promise<void> {
+    context.log(`Blob trigger function processed blob \n Name: ${context.bindingData.blobTrigger} \n Blob Size: ${myBlob.length} Bytes`);
 
-  if (!req.body || !req.body.id || !req.body.title || !req.body.url || !req.body.price ||
-      !req.body.km || !req.body.year || !req.body.location || !req.body.img_url || !req.body.car_brand) {
-    context.res = {
-      status: 400,
-      body: "Please pass all required fields in the request body"
-    };
-    return;
-  }
+    // Configuración de Cosmos DB
+    const cosmosClient = new CosmosClient(process.env.COSMOS_CONNECTION_STRING);
+    const database = cosmosClient.database(process.env.COSMOS_DATABASE_NAME);
+    const carsContainer = database.container("cars");
+    const maxPricesContainer = database.container("maxPrices");
 
-  const { id, title, url, price, km, year, location, img_url, car_brand } = req.body;
+    // Recuperar todos los autos de la base de datos
+    const { resources: cars } = await carsContainer.items.readAll().fetchAll();
 
-  context.log(`Received request with id: ${id}, title: ${title}, url: ${url}, price: ${price}, km: ${km}, year: ${year}, location: ${location}, img_url: ${img_url}, car_brand: ${car_brand}`);
+    if (cars.length > 0) {
+        // Calcular el precio máximo
+        const maxPriceCar = cars.reduce((prev, current) => (prev.price > current.price) ? prev : current);
+        const maxPrice = maxPriceCar.price;
+        const maxPriceId = maxPriceCar.id;
 
-  try {
-    const maxRetries = 3;
-    let attempts = 0;
-    let imageData;
-
-    while (attempts < maxRetries) {
-      try {
-        const response = await axios.get(img_url, { responseType: 'arraybuffer', timeout: 5000 });
-        imageData = Buffer.from(response.data, 'binary');
-        context.log(`Downloaded image from URL: ${img_url}`);
-        break;
-      } catch (error) {
-        attempts++;
-        context.log.error(`Attempt ${attempts} to download image failed: ${error.message}`);
-        if (attempts >= maxRetries) {
-          throw new Error(`Failed to download image after ${maxRetries} attempts`);
-        }
-      }
-    }
-
-    const client = new CosmosClient(process.env.COSMOS_CONNECTION_STRING);
-    const database = client.database(process.env.COSMOS_DATABASE_NAME);
-    const container = database.container(process.env.COSMOS_CONTAINER_NAME);
-
-    context.log('Connected to CosmosDB');
-
-    const document = {
-      id,
-      title,
-      url,
-      price,
-      km,
-      year,
-      location,
-      img_url,
-      car_brand,
-      image_data: imageData.toString('base64'),
-      uploadDate: new Date().toISOString()
-    };
-
-    const { resource } = await container.items.create(document);
-
-    context.log(`Document created with id: ${resource.id}`);
-
-    const querySpec = {
-      query: "SELECT VALUE MAX(c.price) FROM c"
-    };
-
-    const { resources } = await container.items.query(querySpec).fetchAll();
-
-    let maxPrice = 0;
-    if (resources.length > 0) {
-      maxPrice = resources[0];
-      context.log(`Max price found: ${maxPrice}`);
+        // Guardar la información en el contenedor maxPrices
+        await saveMaxPriceToCosmos(maxPrice, maxPriceId, maxPricesContainer);
+        context.log(`Max price item inserted successfully with ID ${maxPriceId}`);
     } else {
-      context.log('No cars found in the database.');
+        context.log("No cars found in the database.");
     }
-
-    context.res = {
-      status: 200,
-      body: `Processed and uploaded modified user to CosmosDB with id: ${id}. The maximum price is ${maxPrice}`
-    };
-  } catch (error) {
-    context.log.error('Error processing request:', error.message);
-    context.log.error('Error details:', error);
-
-    context.res = {
-      status: 500,
-      body: `Error processing request: ${error.message}`
-    };
-  }
 };
 
-export default blobTriggerFunction;
+// Función para guardar el precio máximo en Cosmos DB
+const saveMaxPriceToCosmos = async (maxPrice: number, maxPriceId: string, container: any) => {
+    const uniqueId = uuidv4();
+    const item = {
+        id: uniqueId,
+        max_price: maxPrice,
+        max_price_id: maxPriceId,
+        date: new Date().toISOString()
+    };
+
+    await container.items.create(item);
+};
+
+export default blobTrigger;
