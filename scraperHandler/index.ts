@@ -63,7 +63,8 @@ const mapToModel = (id: string, entry: any) : Car =>
         location: entry["location"],
         imageUrl: entry["img_url"],
         carBrand: entry["car_brand"],
-        url: entry["url"]
+        url: entry["url"],
+        assignedToUserWithId: null
     }
  
     
@@ -73,9 +74,16 @@ const mapToModel = (id: string, entry: any) : Car =>
 
 const cosmosScrapperInsertor: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
     context.log('HTTP trigger function processed a request.');
+
+    const processSecret = process.env.SCRAPPER_SECRET
+
+    if (req.headers["secret"] !== processSecret){
+
+        context.res = { status: 401 }
+        return;
+    }
     
-    
-    const data = req.body;
+    const data = JSON.parse(req.body);
 
     const toInsertData = [];
 
@@ -86,9 +94,9 @@ const cosmosScrapperInsertor: AzureFunction = async function (context: Context, 
     }
 
     const carDataSource = buildCosmosDataSource<Car>("cars");
+    carDataSource.initialize();
 
     await Promise.all(toInsertData.map(car => carDataSource.createOne(car)));
-    
     
     context.res = {
         // status: 200, /* Defaults to 200 */

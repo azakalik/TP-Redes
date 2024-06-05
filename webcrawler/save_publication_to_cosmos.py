@@ -7,12 +7,19 @@ import requests
 
 from publication_dto import PublicationDTO
 
-def save_publication_to_cosmos(publication_dto: PublicationDTO):
+def save_publication_to_cosmos(publication_dto):
     # Create a dictionary representing the item to be inserted into Cosmos DB
-    item = publication_dto.to_dict()
-    azure_function_url = "https://g4vrb5h9-7071.brs.devtunnels.ms/scrapperHandler"
+    azure_function_url = "http://localhost:7071/api/scrapperHandler"
+
+
+    headers = {
+        'secret': 'SCRAPPERSECRET',
+        'Content-Type': 'application/json'  # Ensure the content type is set to application/json
+    }
+
     try:
-        response = requests.post(azure_function_url, json=item)
+
+        response = requests.post(azure_function_url, json=publication_dto,headers= headers)
 
         response.raise_for_status()
         print("Item inserted successfully via Azure Function.")

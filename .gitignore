@@ -5,3 +5,7 @@ dist/
 *.pyc
 local.settings.json
 requests.http
+.env
+clients/cert.json
+clients/idToken.txt
+clients/refreshToken.txt

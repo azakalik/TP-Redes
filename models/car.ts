@@ -8,6 +8,7 @@ export interface Car {
     imageUrl: string;
     carBrand: string;
     url: string;
+    assignedToUserWithId?: string;
 }
 
 
