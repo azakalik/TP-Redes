@@ -1,21 +1,12 @@
 {
-    "bindings": [
-      {
-        "authLevel": "anonymous",
-        "type": "httpTrigger",
-        "direction": "in",
-        "name": "req",
-        "route": "processBlob",
-        "methods": [
-          "post"
-        ]
-      },
-      {
-        "type": "http",
-        "direction": "out",
-        "name": "$return"
-      }
-    ],
-    "scriptFile": "../dist/blobTriggerFunction/index.js"
-  }
-  
+  "bindings": [
+    {
+      "name": "myBlob",
+      "type": "blobTrigger",
+      "direction": "in",
+      "path": "cars/{name}",
+      "connection": "AzureWebJobsStorage"
+    }
+  ],
+  "scriptFile": "../dist/blobTriggerFunction/index.js"
+}
