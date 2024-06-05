@@ -9,7 +9,7 @@ from publication_dto import PublicationDTO
 
 def save_publication_to_cosmos(publication_dto):
     # Create a dictionary representing the item to be inserted into Cosmos DB
-    azure_function_url = "http://localhost:7071/api/scrapperHandler"
+    azure_function_url = "https://graphqlhandlerstpredes.azurewebsites.net/api/scrapperHandler"
 
 
     headers = {

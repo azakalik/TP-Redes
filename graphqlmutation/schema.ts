@@ -11,8 +11,6 @@ export const typeDefs = gql`
 
   type Mutation {
     createCar(car: CarInp!): MutationResponse!
-    deleteCar(id: String!): MutationResponse!
-    deleteUser(id: String!): MutationResponse!
   }
 
   type User {
