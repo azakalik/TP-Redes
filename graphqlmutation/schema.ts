@@ -15,14 +15,6 @@ export const typeDefs = gql`
     deleteUser(id: String!): MutationResponse!
   }
 
-  input UserInp {
-    id: String!
-    name: String!
-    lastName: String!
-    age: Int!
-    carId: String! 
-  }
-
   type User {
     id: String
     name: String
@@ -32,17 +24,24 @@ export const typeDefs = gql`
   }
 
   type Car {
-    id: String
-    make: String
-    model: String
-    miles: Int
+    id: String!
+    make: String!
+    km: Int!
+    year: Int!
+    price: Float!
+    location: String!
+    carBrand: String!
+    user: User
   }
 
   input CarInp {
     id: String!
     make: String!
-    model: String!
-    miles: Int!
+    km: Int!
+    year: Int!
+    price: Float!
+    location: String!
+    carBrand: String!
   }
 
   type CarPage {

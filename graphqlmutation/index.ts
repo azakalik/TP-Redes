@@ -6,6 +6,9 @@ import { CosmosClient } from "@azure/cosmos";
 import { Car } from "../models/car";
 import { User } from "../models/user";
 import {user, car, listCars, listUsers} from "../commonFunctions/commonfunctions"
+
+
+
 const buildCosmosDataSource = <TData extends { id: string }>(
     containerId: string
 ) => {
@@ -31,6 +34,7 @@ const resolvers = {
     Mutation: {
         createCar: async (_, params, context) => {
             const car: Car = params.car;
+            car.assignedToUserWithId = null;
 
             try {
                 const resp = await (
@@ -45,11 +49,17 @@ const resolvers = {
         deleteCar: async (_, params, context) => {
             const carId = params.id;
 
+            const car = await (context.dataSources.car as CosmosDataSource<Car, unknown>).findOneById(carId);
+
+            if (!car){
+                return {success: false, message: "There is no car with the given id", status: 404}
+            }
+
             const { resources: usersArray} = await (context.dataSources.user as CosmosDataSource<User,unknown>)
             .findManyByQuery({ query: "SELECT * FROM c WHERE c.carId = @carId", parameters : [{name: "@carId", value: carId}] });
             
             if (usersArray.length > 0)
-                return {success: false, message: `Deletion operation failed because ${usersArray.length} users have this car assigned`, code: 409};
+                return {success: false, message: `Deletion operation failed because ${usersArray.length} a user has this car assigned`, status: 409};
 
             try {
                 const resp = await (
@@ -64,15 +74,33 @@ const resolvers = {
         deleteUser: async (_, { id }, context) => {
             const userId = id;
 
+
+            const userDataSource = context.dataSources.user as CosmosDataSource<User, unknown>
+            const carDataSource = context.dataSources.car as CosmosDataSource<Car,unknown>
+
             try {
-                const resp = await (
-                    context.dataSources.user as CosmosDataSource<User, unknown>
-                ).deleteOne(userId, userId);
+                //Modificar este nomas
+                const currentUser = await userDataSource.findOneById(userId);
+                if (!currentUser){
+                    return { success: false, message: "User does not exist", status: 404};
+                }
+                if (currentUser.carId){
+                    const currentCar = await carDataSource.findOneById(currentUser.carId);
+
+                    currentCar.assignedToUserWithId = null;
+    
+                    
+                    carDataSource.updateOne(currentCar,currentCar.location);
+
+                }
+
+                
+                userDataSource.deleteOne(currentUser.id,currentUser.id);
 
                 return {
                     success: true,
                     message: `Successfully deleted user with ID ${userId}`,
-                    status: resp.statusCode
+                    status: 200
                 };
             } catch (error) {
                 return {
