@@ -1,11 +1,12 @@
 {
   "bindings": [
     {
-      "name": "myBlob",
-      "type": "blobTrigger",
+      "type": "cosmosDBTrigger",
       "direction": "in",
-      "path": "cars/{name}",
-      "connection": "AzureWebJobsStorage"
+      "name": "inputDocument",
+      "connection": "COSMOS_CONNECTION_STRING",
+      "databaseName": "exampleapp",
+      "containerName": "cars"
     }
   ],
   "scriptFile": "../dist/blobTriggerFunction/index.js"
