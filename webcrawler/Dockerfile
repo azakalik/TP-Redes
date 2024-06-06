@@ -7,6 +7,7 @@ ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
 
 # 1. Install essential packages
 RUN apt-get update \
+    && apt-get upgrade -y \
     && apt-get install -y \
         git \
         wget \
@@ -15,8 +16,8 @@ RUN apt-get update \
         cmake   \
         unixodbc-dev \
         build-essential \
+        libnss3-dev libgdk-pixbuf2.0-dev libgtk-3-dev libxss-dev libasound2 \
     && rm -rf /var/lib/apt/lists/*
-RUN apt-get update && apt-get upgrade && apt-get -y install libnss3-dev libgdk-pixbuf2.0-dev libgtk-3-dev libxss-dev libasound2
 
 # 2. Install Chrome and Chromedriver
 RUN \
