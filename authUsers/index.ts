@@ -51,9 +51,10 @@ const resolvers = {
       const carClient = context.dataSources.car as CosmosDataSource<Car, unknown>
 
       try {
-        const decoded = await auth.verifyIdToken(token);
+        //exception if token is invalid
+        await auth.verifyIdToken(token);
 
-        //base de datos bla bla bla
+        //
         const { resources } = await carClient.findManyByQuery({
           query: "SELECT * FROM c WHERE c.assignedToUserWithId = null OFFSET @offset LIMIT @limit",
           parameters: [{ name: "@offset", value: offset }, { name: "@limit", value: limit }]

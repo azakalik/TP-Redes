@@ -25,13 +25,11 @@ export const typeDefs = gql`
     listFreeCars(limit: Int, offset: Int, token: String!): CarPage
     myData(token: String!): User
   }
-
   type Mutation {
     signUp(user: UserInp! ): MutationResponse!
     takeCar(id: String!, token: String!): MutationResponse!
     releaseCar(token: String!): MutationResponse!
   }
-
   type User {
     id: String
     name: String
@@ -39,22 +37,17 @@ export const typeDefs = gql`
     age: Int
     car: Car # Return a Car object instead of ID
   }
-
   input SignInUserInp{
     email: String!
     password: String!
   }
-
   input UserInp {
-
     name: String!
     lastName: String!
     age: Int!
     email: String!
     password: String!
-
   }
-
   type Car {
     id: String
     make: String
@@ -65,7 +58,6 @@ export const typeDefs = gql`
     carBrand: String
     user: User
   }
-
   type CarPage {
     items: [Car]
     itemsCount: Int
