@@ -8,7 +8,7 @@ docker build --tag therealspackjarrow/azurefunctionsimage:v1.0.0 .
 ## Run the image locally
 Execute the following code
 ```bash
-docker run -p 8080:80 -it therealspackjarrow/azurefunctionsimage:v1.0.0
+sudo sudo docker run --rm -p 8080:80 -it   -e CONNECTION_STRING="<COSMOS_CONNECTION_STRING>" -e DATABASE_ID="<DB_ID>" -e CONTAINER_ID="<CONTAINER_ID>"   therealspackjarrow/azurefunctionsimage:v1.0.0
 ```
 You can then access the following endpoint: `http://localhost:8080/api/scrape_ml`
 Remember to add at the end a `car_brand`.
