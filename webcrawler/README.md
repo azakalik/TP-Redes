@@ -32,19 +32,33 @@ The commands below create:
 - A Storage account, which is used to maintain state and other information about your functions.
 - An Azure Container Apps environment with a Log Analytics workspace.
 ```bash
-az group create --name US3AzureFunctionsContainers-rg --location centralus
-az containerapp env create --name US3MyContainerappEnvironment --enable-workload-profiles --resource-group US3AzureFunctionsContainers-rg --location centralus
-az storage account create --name us3storage --location centralus --resource-group US3AzureFunctionsContainers-rg --sku Standard_LRS
+az group create --name AzureFunctionsContainer --location eastus2
+az containerapp env create --name AzureFunctionsContainerappEnvironment --enable-workload-profiles --resource-group AzureFunctionsContainer --location eastus2
+az storage account create --name azureseleniumstorage --location eastus2 --resource-group AzureFunctionsContainer --sku Standard_LRS
 ```
-This verifies that everything executed correctly
-```bash
-az containerapp env show -n US3MyContainerappEnvironment -g US3AzureFunctionsContainers-rg
-```
+
 
 ### Create the function app
 ```bash
-az functionapp create --name us3azureseleniumfunction --storage-account us3storage --environment US3MyContainerappEnvironment --workload-profile-name "Consumption" --resource-group US3AzureFunctionsContainers-rg --functions-version 4 --runtime python --image therealspackjarrow/azurefunctionsimage:v1.0.0
-az functionapp function show --resource-group US3AzureFunctionsContainers-rg --name us3azureseleniumfunction --function-name HttpExample --query invokeUrlTemplate
+az functionapp create --name azureseleniumfunction --storage-account azureseleniumstorage --environment AzureFunctionsContainerappEnvironment --workload-profile-name "Consumption" --resource-group AzureFunctionsContainer --functions-version 4 --runtime python --image sranucci/azurefunctionsimage:v1.0.0
+
+
+#reemplazar 
+# your_connection_string=<String de conexion de azure>
+# your_database_id="CarStore"
+# your_container_id="cars"
+az functionapp config appsettings set --name azureseleniumfunction --resource-group AzureFunctionsContainer --settings CONNECTION_STRING="your_connection_string" DATABASE_ID="your_database_id" CONTAINER_ID="your_container_id"
+
+
+az functionapp function show --resource-group AzureFunctionsContainers-rg --name azureseleniumfunction --function-name HttpExample --query invokeUrlTemplate
+```
+
+
+```
+>az group create --name AzureFunctionsContainers-rg --location eastus2
+
+>
+
 ```
 
 ### Credits
