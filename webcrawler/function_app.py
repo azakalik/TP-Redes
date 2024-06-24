@@ -8,12 +8,22 @@ import json
 from create_driver import create_driver
 from scrape_ml import scrape_ml
 from save_publication_to_cosmos import save_publication_to_cosmos
+import os
+
 
 app = func.FunctionApp()
 
 @app.route(route="scrape_ml", auth_level=func.AuthLevel.ANONYMOUS)
 def HttpExample(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
+
+    # Check if the X-SECRET header matches the given string
+    secret = req.headers.get('X-secret')
+    if secret != os.environ['X-SECRET']:
+        return func.HttpResponse(
+            "Unauthorized",
+            status_code=401
+        )
 
     car_brand = req.params.get('car_brand')
     if not car_brand:
@@ -22,7 +32,7 @@ def HttpExample(req: func.HttpRequest) -> func.HttpResponse:
         except ValueError:
             pass
         else:
-            name = req_body.get('car_brand')
+            car_brand = req_body.get('car_brand')
 
     if car_brand:
         driver = create_driver()
